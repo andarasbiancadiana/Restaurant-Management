@@ -9,16 +9,16 @@ public class Main {
 
     public static void main(String[] args) {
         config = ConfigLoader.load("config.json");
-        Map<Category, List<Product>> menu = new HashMap<>();
+        Menu menu = new Menu();
         List<Order> orders = new ArrayList<>();
         List<SpecialOffer> offers = new ArrayList<>();
 
-        menu.put(Category.FEL_PRINCIPAL, List.of(
+        menu.addCategory(Category.FEL_PRINCIPAL, List.of(
                 new Food("Pizza Margherita", 45.0, true, 450),
                 new Food("Paste Carbonara", 52.5, false, 400)
         ));
 
-        menu.put(Category.BAUTURI_RACORITOARE, List.of(
+        menu.addCategory(Category.BAUTURI_RACORITOARE, List.of(
                 new Drink("Limonada", 15.0, true, 400),
                 new Drink("Apa Plata", 8.0, true, 500)
         ));
@@ -43,9 +43,9 @@ public class Main {
             switch (choice) {
                 case 1:
                     System.out.println("−−− Meniul Restaurantului \"" + config.getRestaurantName() + "\" −−−");
-                    for (Category category : menu.keySet()) {
+                    for (Category category : menu.getCategories()) {
                         System.out.println("== " + category.getDisplayName() + " ==");
-                        List<Product> products = menu.get(category);
+                        List<Product> products = menu.getProductsByCategory(category);
                         for (Product product : products) {
                             product.displayInfo();
                         }
@@ -116,21 +116,14 @@ public class Main {
         }
     }
 
-    public static Optional<Product> findProductByName(Map<Category, List<Product>> menu, String name) {
-        return menu.values().stream()
-                .flatMap(List::stream)
-                .filter(p -> p.getName().equalsIgnoreCase(name))
-                .findFirst();
+    public static Optional<Product> findProductByName(Menu menu, String name) {
+        if (menu == null) return Optional.empty();
+        return menu.findProductByName(name);
     }
 
-    public static void createNewOrder(Map<Category, List<Product>> menu, List<Order> orders) {
-        List<Product> productsMenu = new ArrayList<>();
-
-        for (List<Product> list : menu.values()) {
-            productsMenu.addAll(list);
-        }
-        // int counter = 1;
-        Order order = new Order(config.getTva());
+    public static void createNewOrder(Menu menu, List<Order> orders) {
+        List<Product> productsMenu = menu.getAllProducts();
+        Order order = new Order();
         boolean running = true;
         while (running) {
             System.out.println("1. Adauga produs standard");
@@ -140,9 +133,17 @@ public class Main {
             switch (choice) {
                 case 1:
                     System.out.println("Selecteaza produsul dupa numar:");
-                    for (int i = 0; i < productsMenu.size(); i++) {
-                        System.out.print((i + 1) + ". ");
-                        productsMenu.get(i).displayInfo();
+                    for (Category category : menu.getCategories()) {
+                        System.out.println("== " + category.getDisplayName() + " ==");
+                        List<Product> catProducts = menu.getProductsByCategory(category);
+                        if (catProducts == null) continue;
+                        for (int i = 0; i < productsMenu.size(); i++) {
+                            Product p = productsMenu.get(i);
+                            if (catProducts.contains(p)) {
+                                System.out.print((i + 1) + ". ");
+                                p.displayInfo();
+                            }
+                        }
                     }
                     int productIndex = scanner.nextInt() - 1;
                     if (productIndex < 0 || productIndex >= productsMenu.size()) {
@@ -182,7 +183,7 @@ public class Main {
                     System.out.println("Introdu cantitatea:");
                     int pizzaQuantity = scanner.nextInt();
                     order.addProduct(customPizza, pizzaQuantity);
-                    System.out.println("restaurant.Pizza customizata adaugata in comanda.");
+                    System.out.println("Pizza customizata adaugata in comanda.");
                     break;
                 case 3:
                     if (!order.isEmpty()) {

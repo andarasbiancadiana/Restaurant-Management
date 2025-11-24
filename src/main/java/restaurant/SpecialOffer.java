@@ -9,11 +9,10 @@ public abstract class SpecialOffer {
 
     protected void printOfferApplied(Order order, double discount) {
         System.out.println("Oferta aplicată: " + getName());
-        System.out.println("Total (după ofertă): " + (order.calculateTotalWithoutOffer() - discount) + " RON");
+        System.out.println("Total (după ofertă): " + String.format("%.2f", (order.calculateTotalWithoutOffer() - discount)) + " RON");
         System.out.println(" ----------- ");
     }
 
-    // Hardcoded offers
     public static final SpecialOffer PIZZA_DRINK_FREE = new SpecialOffer() {
         @Override
         public String getName() {
@@ -44,7 +43,7 @@ public abstract class SpecialOffer {
             }
 
             if (cheapestDrink != null) {
-                double discount = cheapestDrink.getPrice(); // 1 drink free
+                double discount = cheapestDrink.getPrice();
                 order.setCurrentDiscount(discount);
                 printOfferApplied(order, discount);
             }
@@ -56,7 +55,7 @@ public abstract class SpecialOffer {
         public String getName() { return "Valentine’s Day - 10% reducere"; }
 
         @Override
-        public boolean isApplicable(Order order) { return true; } // always applicable
+        public boolean isApplicable(Order order) { return true; }
 
         @Override
         public void applyDiscount(Order order) {

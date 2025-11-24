@@ -12,6 +12,11 @@ import java.util.Map;
 
 public class MenuExport {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    public static boolean exportMenu(Menu menu, Path targetFile) {
+        return exportMenu(menu.asMap(), targetFile);
+    }
+
     public static boolean exportMenu(Map<Category, List<Product>> menu, Path targetFile) {
         Map<String, List<Product>> serializable = new LinkedHashMap<>();
         for (Category c : Category.values()) {

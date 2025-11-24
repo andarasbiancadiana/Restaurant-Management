@@ -4,28 +4,25 @@ import java.util.*;
 
 public class MenuQueries {
 
-    // 1. Lista preparatelor vegetariene, sortate alfabetic
-    public static List<Product> getVegetarianProducts(Map<Category, List<Product>> menu) {
-        return menu.values().stream()
-                .flatMap(List::stream)
+    public static List<Product> getVegetarianProducts(Menu menu) {
+        if (menu == null) return List.of();
+        return menu.getAllProducts().stream()
                 .filter(p -> p instanceof Food food && food.isVegetarian())
                 .sorted(Comparator.comparing(Product::getName))
                 .toList();
     }
 
-    // 2. Pretul mediu al deserturilor
-    public static OptionalDouble getAverageDessertPrice(Map<Category, List<Product>> menu) {
-        return menu.entrySet().stream()
-                .filter(e -> e.getKey() == Category.DESERT)
-                .flatMap(e -> e.getValue().stream())
+    public static OptionalDouble getAverageDessertPrice(Menu menu) {
+        if (menu == null) return OptionalDouble.empty();
+        List<Product> desserts = menu.getProductsByCategory(Category.DESERT);
+        return desserts.stream()
                 .mapToDouble(Product::getPrice)
                 .average();
     }
 
-    // 3. Verificare daca exista produse > 100 RON
-    public static boolean existsOver100(Map<Category, List<Product>> menu) {
-        return menu.values().stream()
-                .flatMap(List::stream)
+    public static boolean existsOver100(Menu menu) {
+        if (menu == null) return false;
+        return menu.getAllProducts().stream()
                 .anyMatch(p -> p.getPrice() > 100);
     }
 }

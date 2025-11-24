@@ -4,17 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Order {
-    private final int TVA;
+    private static final int TVA;
+    static {
+        int t = 9;
+        try {
+            Config config = ConfigLoader.load("config.json");
+            if (config != null) {
+                t = config.getTva();
+            }
+        } catch (Throwable e) {
+            System.err.println("Nu s-a putut incarca TVA din fisierul de configurare, se va folosi valoarea implicita");
+        }
+        TVA = t;
+    }
     private Map<Product, Integer> products;
     private double currentDiscount = 0;
 
-    public Order(int TVA) {
-        this.TVA = TVA;
-        products = new HashMap<>();
-    }
-
     public Order() {
-        this(0);
+        products = new HashMap<>();
     }
 
     public Map<Product, Integer> getProducts() { return products; }
