@@ -1,4 +1,4 @@
-# ProiectRestaurant
+# Restaurant Management App
 
 Java console-based restaurant application built with **Maven**. It simulates a restaurant menu and ordering workflow, including categories, order creation, daily special offers, menu queries, product search, and menu export to JSON (using Gson).
 
